@@ -28,6 +28,7 @@ public:
     int offsetX;
     int offsetY;
 
+
 private:
     int cellSz;
     int rotatePos;

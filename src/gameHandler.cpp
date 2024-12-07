@@ -49,6 +49,7 @@ void gameHandler::drawGame()
     ghostBlock.Draw(ghostColor);
 
     // Draw current block
+
     currBlock.Draw();
     int nextBlockX = GetScreenWidth() - 250;
     int nextBlockY = 100;
@@ -207,9 +208,8 @@ void gameHandler::updateGame()
     {
         moveDown();
         moveDownTimer = 0.0f;
-
-        updateGhostBlock(); // Update ghost block position
     }
+    updateGhostBlock(); 
 }
 
 void gameHandler::moveLeft()
