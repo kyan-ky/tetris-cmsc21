@@ -25,12 +25,12 @@ gameHandler::gameHandler()
     gameOverFx = LoadSound("sound/gameover.wav");
     moveFx = LoadSound("sound/move.mp3");
     dropFx = LoadSound("sound/drop.mp3");
-  
+
     moveDelay = 0.08f; // Delay in seconds (0.2 default)
     lastMoveTime = 0.0f;
 
     canHoldPiece = true;
-  
+
     updateGhostBlock(); // Initialize ghost block
 }
 
@@ -45,8 +45,8 @@ void gameHandler::drawGame()
     board.drawBoard();
 
     // Draw ghost block with a translucent color
-    Color ghostColor = Fade(WHITE, 0.5f);  // Adjust transparency as needed
-    ghostBlock.Draw();
+    Color ghostColor = Fade(WHITE, 0.3f); // Adjust transparency as needed
+    ghostBlock.Draw(ghostColor);
 
     // Draw current block
     currBlock.Draw();
@@ -130,7 +130,6 @@ void gameHandler::holdPiece()
         currBlock = nextBlock;        // Replace current block with the next block
         nextBlock = getRandomBlock(); // Generate a new next block
         checkHoldPiece = true;        // Mark that a piece has been held
-
     }
     else
     {
@@ -161,26 +160,31 @@ void gameHandler::inputHandler()
     {
         moveLeft();
         lastMoveTime = currentTime;
+        updateGhostBlock();
     }
     if (IsKeyDown(KEY_RIGHT) && (currentTime - lastMoveTime > moveDelay))
     {
         moveRight();
         lastMoveTime = currentTime;
+        updateGhostBlock();
     }
     if (IsKeyDown(KEY_DOWN) && (currentTime - lastMoveTime > moveDelay))
     {
         moveDown();
         lastMoveTime = currentTime;
+        updateGhostBlock();
     }
 
     // Actions triggered by single press
     if (IsKeyPressed(KEY_UP))
     {
         rotateBlock();
+        updateGhostBlock();
     }
     if (IsKeyPressed(KEY_SPACE))
     {
         fastDrop();
+        updateGhostBlock();
     }
     if (IsKeyPressed(KEY_C))
     {
@@ -203,8 +207,8 @@ void gameHandler::updateGame()
     {
         moveDown();
         moveDownTimer = 0.0f;
-      
-        updateGhostBlock();  // Update ghost block position
+
+        updateGhostBlock(); // Update ghost block position
     }
 }
 
@@ -300,35 +304,42 @@ void gameHandler::lockBlock()
 
     canHoldPiece = true;
     PlaySound(dropFx);
+    updateGhostBlock();
 }
 
-void gameHandler::updateGhostBlock() {
-    ghostBlock = currBlock;  // Copy current block
-    while (true) {
-        ghostBlock.Move(1, 0);  // Move down
-        if (checkBounds() || !checkCollision(ghostBlock)) {
-            ghostBlock.Move(-1, 0);  // Undo move
+void gameHandler::updateGhostBlock()
+{
+    ghostBlock = currBlock; // Copy current block
+    while (true)
+    {
+        ghostBlock.Move(1, 0); // Move down
+        if (checkBounds() || !checkCollision(ghostBlock))
+        {
+            ghostBlock.Move(-1, 0); // Undo move
             break;
         }
     }
 }
 
-bool gameHandler::checkCollision(blockMain block) {
+bool gameHandler::checkCollision(blockMain block)
+{
     vector<Pos> tile = block.getCellPos();
-    for (Pos item : tile) {
-        if (!board.checkCollision(item.x, item.y)) {
+    for (Pos item : tile)
+    {
+        if (!board.checkCollision(item.x, item.y))
+        {
             return false;
         }
     }
     return true;
 }
 
-
-bool gameHandler::checkCollision() {
+bool gameHandler::checkCollision()
+{
     return checkCollision(currBlock);
 }
 
-bool gameHandler::checkBounds() 
+bool gameHandler::checkBounds()
 {
     vector<Pos> tile = currBlock.getCellPos();
     for (Pos item : tile)
